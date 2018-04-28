@@ -48,7 +48,7 @@ class EnvironmentCommand extends ContainerAwareCommand
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'List all environments (by default list internal environments only)'
+                'List all environments (by default list managed environments only)'
             )
         ;
     }
@@ -79,7 +79,7 @@ class EnvironmentCommand extends ContainerAwareCommand
             '# Indexes',
         ]);
 
-        $rows = [];
+
         /** @var Environment $environment */
         foreach ( $environments as $environment) {
             $table->addRow([
