@@ -14,6 +14,7 @@ use EMS\CoreBundle\Service\ContentTypeService;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,17 +60,39 @@ class EnvironmentCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if($input->hasOption('all')){
+        if($input->getOption('all')){
             $environments = $this->environmentService->getAll();
         }
         else {
             $environments = $this->environmentService->getManagedEnvironement();
         }
 
+        $table = new Table($output);
+
+        $table->setHeaders([
+            'Created',
+            'Modified',
+            'Name',
+            'Alias',
+            'Managed',
+            'As default for',
+            '# Indexes',
+        ]);
+
+        $rows = [];
         /** @var Environment $environment */
         foreach ( $environments as $environment) {
-            $output->writeln($environment->getName());
+            $table->addRow([
+                $environment->getCreated()->format('c'),
+                $environment->getModified()->format('c'),
+                $environment->getName(),
+                $environment->getAlias(),
+                $environment->getManaged()?'true':'false',
+                count($environment->getContentTypesHavingThisAsDefault()),
+                count($environment->getSingleTypeIndexes()),
+            ]);
         }
+        $table->render();
     }
 
 
