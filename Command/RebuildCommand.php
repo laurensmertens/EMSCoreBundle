@@ -172,13 +172,16 @@ class RebuildCommand extends EmsCommand
 	    	if( ! $input->getOption('yellow-ok') ){
 	    		$this->waitForGreen($output);
 	    	}
-	    	if(empty($indexes)){
+	    	if(!$this->singleTypeIndex){
                 $indexes = [$singleIndexName];
             }
-			$this->switchAlias($environment->getAlias(), $indexes, true, $output);
-			$output->writeln('The alias <info>'.$environment->getName().'</info> is now pointing to :');
-			foreach ($indexes as $index){
-                $output->writeln('     - '.$index);
+
+            $this->switchAlias($environment->getAlias(), $indexes, true, $output);
+            if(!empty($indexes)){
+                $output->writeln('The alias <info>'.$environment->getName().'</info> is now pointing to :');
+                foreach ($indexes as $index){
+                    $output->writeln('     - '.$index);
+                }
             }
 		}
 		else{
@@ -203,7 +206,6 @@ class RebuildCommand extends EmsCommand
      */
     private function switchAlias($alias, $toIndexes, $newEnv=false, OutputInterface $output){
     	try{
-
 
     		$result = $this->client->indices()->getAlias(['name' => $alias]);
     		$params ['body']['actions'] = [];
