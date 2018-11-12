@@ -1,21 +1,29 @@
 {
   "dependencies": {
-    "admin-lte": "^2.3.2",
-    "bootstrap-fileinput": "^4.5.0",
-    "bootstrap-sass": "3.3.7",
-    "bootstrap-select": "^1.13.2",
-    "datepicker": "^0.0.0",
-    "daterangepicker": "^3.0.3",
-    "icheck": "^1.0.2",
-    "webpack-jquery-ui": "^2.0.1"
+    "@babel/polyfill": "^7.0.0",
+    "element-closest": "^2.0.2"
   },
   "engines": {
     "yarn": ">= 1.0.0"
   },
+  "license": "MIT",
   "scripts": {},
   "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
+    "admin-lte": "^2.3.2",
+    "babel-loader": "^8.0.4",
+    "bootstrap-fileinput": "^4.5.0",
+    "bootstrap-sass": "3.3.7",
+    "bootstrap-select": "^1.13.2",
+    "css-entry-webpack-plugin": "^1.0.0-beta.4",
     "css-loader": "^1.0.0",
+    "datepicker": "^0.0.0",
+    "daterangepicker": "^3.0.3",
     "file-loader": "^2.0.0",
+    "icheck": "^1.0.2",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
     "mini-css-extract-plugin": "^0.4.2",
@@ -25,6 +33,7 @@
     "style-loader": "^0.23.0",
     "url-loader": "^1.1.1",
     "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0"
+    "webpack-cli": "^3.1.0",
+    "webpack-jquery-ui": "^2.0.1"
   }
 }

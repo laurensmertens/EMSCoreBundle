@@ -14,6 +14,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     {%  if webpack  %}
         <!-- stylesheets -->
+        <link rel="stylesheet" href="{{ asset('bundles/emscore/css/ems-app.bundle.css') }}">
         {% if theme_color %}
             <link rel="stylesheet" href="{{ asset('bundles/emscore/css/'~theme_color~'.bundle.css') }}">
         {%  else %}
@@ -48,26 +49,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 {% endblock %}
 </head>
-<!--
-BODY TAG OPTIONS:
-=================
-Apply one or more of the following classes to get the
-desired effect
-|---------------------------------------------------------|
-| SKINS         | skin-blue                               |
-|               | skin-black                              |
-|               | skin-purple                             |
-|               | skin-yellow                             |
-|               | skin-red                                |
-|               | skin-green                              |
-|---------------------------------------------------------|
-|LAYOUT OPTIONS | fixed                                   |
-|               | layout-boxed                            |
-|               | layout-top-nav                          |
-|               | sidebar-collapse                        |
-|               | sidebar-mini                            |
-|---------------------------------------------------------|
--->
 <body class="hold-transition skin-{{ theme_color }} {% if app.user %}{% if app.user.layoutBoxed %}layout-boxed{% endif %}{% if app.user.sidebarCollapse %} sidebar-collapse{% endif %}{% if app.user.sidebarMini %} sidebar-mini{% endif %}{% endif %}">
 <div class="wrapper">
 
@@ -460,12 +441,12 @@ desired effect
 
 <!-- REQUIRED JS SCRIPTS -->
 {%  if webpack %}
-
-    {% if theme_color %}
-        <script src="{{ asset('bundles/emscore/js/'~theme_color~'.bundle.js') }}"></script>
-    {%  else %}
-        <script src="{{ asset('bundles/emscore/js/blue.bundle.js') }}"></script>
-    {%  endif %}
+    <script src="{{ asset('bundles/emscore/js/ems-app.bundle.js') }}"></script>
+    {#{% if theme_color %}#}
+        {#<script src="{{ asset('bundles/emscore/js/'~theme_color~'.bundle.js') }}"></script>#}
+    {#{%  else %}#}
+        {#<script src="{{ asset('bundles/emscore/js/blue.bundle.js') }}"></script>#}
+    {#{%  endif %}#}
 
     <!-- CK editor App -->
     <script src="{{ asset('bundles/emscore/bower/ckeditor/ckeditor.js') }}"></script>

@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssEntryPlugin = require("css-entry-webpack-plugin");
 
 module.exports = {
     plugins: [
@@ -13,18 +14,19 @@ module.exports = {
     ],
     context: path.resolve(__dirname, './'),
     entry: {
-        'black': './Resources/assets/skins/black.js',
-        'black-light': './Resources/assets/skins/black-light.js',
-        'blue': './Resources/assets/skins/blue.js',
-        'blue-light': './Resources/assets/skins/blue-light.js',
-        'green': './Resources/assets/skins/green.js',
-        'green-light': './Resources/assets/skins/green-light.js',
-        'purple': './Resources/assets/skins/purple.js',
-        'purple-light': './Resources/assets/skins/purple-light.js',
-        'red': './Resources/assets/skins/red.js',
-        'red-light': './Resources/assets/skins/red-light.js',
-        'yellow': './Resources/assets/skins/yellow.js',
-        'yellow-light': './Resources/assets/skins/yellow-light.js',
+        'black': ['admin-lte/build/less/skins/skin-black.less'],
+        'black-light': ['admin-lte/build/less/skins/skin-black-light.less'],
+        'blue': ['admin-lte/build/less/skins/skin-blue.less'],
+        'blue-light': ['admin-lte/build/less/skins/skin-blue-light.less'],
+        'green': ['admin-lte/build/less/skins/skin-green.less'],
+        'green-light': ['admin-lte/build/less/skins/skin-green-light.less'],
+        'purple': ['admin-lte/build/less/skins/skin-purple.less'],
+        'purple-light': ['admin-lte/build/less/skins/skin-purple-light.less'],
+        'red': ['admin-lte/build/less/skins/skin-red.less'],
+        'red-light': ['admin-lte/build/less/skins/skin-red-light.less'],
+        'yellow': ['admin-lte/build/less/skins/skin-yellow.less'],
+        'yellow-light': ['admin-lte/build/less/skins/skin-yellow-light.less'],
+        'ems-app': ['@babel/polyfill', './Resources/assets/app.js'],
     },
     output: {
         path: path.resolve(__dirname, 'Resources/public'),
@@ -33,6 +35,10 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                loader: 'babel-loader'
+            },
             {
                 test: /\.less$/,
                 use: [{
