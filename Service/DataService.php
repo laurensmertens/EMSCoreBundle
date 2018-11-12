@@ -37,7 +37,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Form\FormInterface;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use EMS\CoreBundle\Event\UpdateRevisionReferersEvent;
-use EMS\CoreBundle\Exception\NotLockedException;
 use EMS\CoreBundle\Exception\CantBeFinalizedException;
 
 class DataService
