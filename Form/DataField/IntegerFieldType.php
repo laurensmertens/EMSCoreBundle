@@ -105,17 +105,12 @@ class IntegerFieldType extends DataFieldType {
 	public function buildOptionsForm(FormBuilderInterface $builder, array $options) {
 		parent::buildOptionsForm ( $builder, $options );
 		$optionsForm = $builder->get ( 'options' );
-		
-	
-// 		// String specific display options
-// 		$optionsForm->get ( 'displayOptions' )->add ( 'choices', TextareaType::class, [
-// 				'required' => false,
-// 		] )->add ( 'labels', TextareaType::class, [
-// 				'required' => false,
-// 		] );
-	
-// 		// String specific mapping options
-// 		$optionsForm->get ( 'mappingOptions' )->add ( 'analyzer', AnalyzerPickerType::class);
+
+        // String specific mapping options
+        $optionsForm->get ( 'mappingOptions' )
+            ->add ( 'copy_to', TextType::class, [
+                'required' => false,
+            ] );
 	}	
 	
 	/**
