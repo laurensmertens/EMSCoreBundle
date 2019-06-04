@@ -17,7 +17,7 @@ class EmsCommand extends ContainerAwareCommand
     /**@var Logger*/
     protected $logger;
     
-    public function __construct(LoggerInterface $logger, Client $client)
+    public function __construct(LoggerInterface $logger, ?Client $client)
     {
         $this->logger = $logger;
         $this->client = $client;

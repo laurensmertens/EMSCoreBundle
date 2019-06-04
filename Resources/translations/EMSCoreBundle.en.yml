@@ -358,6 +358,9 @@ data.edit_revision.save_draft: Save draft
 emsco.elasticsearch.status.html.goto_phpinfo: Displays information about PHP's configurations and versions
 
 command:
+  import_translations:
+    start: 'Start importing translations'
+    end: 'Translations imported'
   reindex:
     environment_not_found: 'Environment named "%environment%" not found'
     start: 'Start reindexing %contenttype% in %environment%'

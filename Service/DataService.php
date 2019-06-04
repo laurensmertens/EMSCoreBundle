@@ -1134,17 +1134,9 @@ class DataService
         return $revision;
     }
 
-    /**
-     * @param Revision $revision
-     * @return bool|int
-     * @throws LockedException
-     * @throws ORMException
-     * @throws OptimisticLockException
-     * @throws PrivilegeException
-     */
-    public function discardDraft(Revision $revision)
+    public function discardDraft(Revision $revision, string $username = null)
     {
-        $this->lockRevision($revision);
+        $this->lockRevision($revision, null, false, $username);
 
         /** @var EntityManager $em */
         $em = $this->doctrine->getManager();
@@ -1180,7 +1172,7 @@ class DataService
             if (count($result) == 1) {
                 /** @var Revision $previous */
                 $previous = $result[0];
-                $this->lockRevision($previous);
+                $this->lockRevision($previous, null, false, $username);
                 $previous->setEndTime(null);
                 if ($previous->getEnvironments()->isEmpty()) {
                     $previous->setDraft(true);
