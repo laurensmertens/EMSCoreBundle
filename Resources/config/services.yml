@@ -505,7 +505,7 @@ services:
         arguments: ['@doctrine', '@request_stack', '%ems_core.paging_size%']
     ems.service.elasticsearch:
         class: EMS\CoreBundle\Service\ElasticsearchService
-        arguments: ['@app.elasticsearch', '@logger']
+        arguments: ['@app.elasticsearch', '@logger', '@ems_common.elastica.client']
     ems.service.template:
         class: EMS\CoreBundle\Service\TemplateService
         arguments: ['@doctrine', '@logger', '@twig']

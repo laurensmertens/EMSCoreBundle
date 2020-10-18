@@ -2,74 +2,68 @@
 
 namespace EMS\CoreBundle\Service;
 
+use Elastica\Client as ElasticaClient;
+use Elastica\Query\BoolQuery;
+use Elastica\Query\Term;
+use Elastica\Search;
 use Elasticsearch\Client;
+use EMS\CommonBundle\Common\Document;
 use EMS\CommonBundle\Elasticsearch\Request\RequestInterface;
-use EMS\CommonBundle\Elasticsearch\Request\ScrollRequest;
 use EMS\CommonBundle\Elasticsearch\Response\Response;
 use EMS\CommonBundle\Elasticsearch\Response\ResponseInterface;
-use EMS\CoreBundle\Exception\SingleResultException;
-use EMS\CommonBundle\Common\Document;
 use EMS\CommonBundle\Helper\EmsFields;
 use EMS\CoreBundle\Entity\ContentType;
 use EMS\CoreBundle\Entity\Environment;
+use EMS\CoreBundle\Exception\SingleResultException;
 use Psr\Log\LoggerInterface;
 
 class ElasticsearchService
 {
 
-    /** @var ?string */
-    private $cachedVersion;
-
     /** @var LoggerInterface */
     private $logger;
-
 
     /** @var Client */
     private $client;
 
-    public function __construct(Client $client, LoggerInterface $logger)
+    /** @var ElasticaClient */
+    private $elasticaClient;
+
+    public function __construct(Client $client, LoggerInterface $logger, ElasticaClient $elasticaClient)
     {
         $this->client = $client;
         $this->logger = $logger;
-        $this->cachedVersion = null;
+        $this->elasticaClient = $elasticaClient;
     }
 
-    /**
-     * Returns the parameter specified version
-     *
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
-        if ($this->cachedVersion === null) {
-            $this->cachedVersion = $this->client->info()['version']['number'];
-        }
-        return $this->cachedVersion;
+        return $this->elasticaClient->getVersion();
     }
 
-
-    public function get(Environment $environment, ContentType $contentType, $ouuid): Document
+    public function get(Environment $environment, ContentType $contentType, string $ouuid): Document
     {
-        $result = $this->client->search([
-            'index' => $environment->getAlias(),
-            'body' => [
-                'query' => [
-                    'bool' => [
-                        'must' => [['term' => ['_id' => $ouuid]]],
-                        'minimum_should_match' => 1,
-                        'should' => [
-                            ['term' => ['_type' => $contentType->getName()]],
-                            ['term' => ['_contenttype' => $contentType->getName()]],
-                        ],
-                    ],
-                ],
-                'size' => 1,
-            ]
-        ]);
+        $termId = new Term();
+        $termId->setTerm('_id', $ouuid);
 
-        if (0 === $result['hits']['total']) {
+        $termType = new Term();
+        $termType->setTerm('_type', $contentType->getName());
+
+        $termContentType = new Term();
+        $termContentType->setTerm('_contenttype', $contentType->getName());
+
+        $query = new BoolQuery();
+        $query->addMust($termId);
+        $query->setMinimumShouldMatch(1);
+        $query->addShould($termType);
+        $query->addShould($termContentType);
+
+        $search = new Search($this->elasticaClient);
+        $resultSet = $search->addIndex($environment->getAlias())->search($query, 1);
+
+        if ($resultSet->getTotalHits() === 0) {
             $this->logger->error('log.elasticsearch.too_few_document_result', [
-                'total' => $result['hits']['total'],
+                'total' => $resultSet->getTotalHits(),
                 EmsFields::LOG_CONTENTTYPE_FIELD => $contentType->getName(),
                 EmsFields::LOG_OUUID_FIELD => $ouuid,
                 EmsFields::LOG_ENVIRONMENT_FIELD => $environment->getName(),
@@ -77,36 +71,40 @@ class ElasticsearchService
             throw new SingleResultException('Expected one result, got 0');
         }
 
-        if (1 !== $result['hits']['total']) {
+        if ($resultSet->getTotalHits() !== 1) {
             $this->logger->error('log.elasticsearch.too_many_document_result', [
-                'total' => $result['hits']['total'],
+                'total' => $resultSet->getTotalHits(),
                 EmsFields::LOG_CONTENTTYPE_FIELD => $contentType->getName(),
                 EmsFields::LOG_OUUID_FIELD => $ouuid,
                 EmsFields::LOG_ENVIRONMENT_FIELD => $environment->getName(),
             ]);
-            throw new SingleResultException(sprintf('Expected one result, got %s', $result['hits']['total']));
+            throw new SingleResultException(sprintf('Expected one result, got %s', $resultSet->getTotalHits()));
         }
 
-        return new Document($contentType->getName(), $ouuid, $result['hits']['hits'][0]['_source']);
+        /** @var \Elastica\Document $document */
+        foreach ($resultSet->getDocuments() as $document) {
+            $data = $document->getData();
+            if (is_string($data)) {
+                throw new \RuntimeException('Unexpected string as data');
+            }
+            return new Document($contentType->getName(), $ouuid, $data);
+        }
+        throw new \RuntimeException('Unexpected empty result set');
     }
 
 
     /**
-     * Compare the parameter specified version with a string
-     *
-     * @param string $version
-     * @return mixed
+     * @return int|bool
      */
-    public function compare($version)
+    public function compare(string $version)
     {
-        return version_compare($this->getVersion(), $version);
+        return \version_compare($this->getVersion(), $version);
     }
 
     /**
-     * Return a keyword mapping (not analyzed)
-     * @return string[]
+     * @return array<string, string>
      */
-    public function getKeywordMapping()
+    public function getKeywordMapping(): array
     {
         if (version_compare($this->getVersion(), '5') > 0) {
             return [
@@ -120,12 +118,11 @@ class ElasticsearchService
     }
 
 
-
     /**
-     * Convert mapping
-     * @return string[]
+     * @param array<string, string>  $in
+     * @return array<string, string>
      */
-    public function convertMapping(array $in)
+    public function convertMapping(array $in): array
     {
         $out = $in;
         if (version_compare($this->getVersion(), '5') > 0) {
@@ -152,10 +149,10 @@ class ElasticsearchService
 
 
     /**
-     * Return a keyword mapping (not analyzed)
-     * @return string[]
+     * @param array<string, string> $mapping
+     * @return array<string, bool|string|string[]>
      */
-    public function updateMapping($mapping)
+    public function updateMapping(array $mapping): array
     {
 
         if (isset($mapping['copy_to']) && !empty($mapping['copy_to']) && is_string($mapping['copy_to'])) {
@@ -183,10 +180,9 @@ class ElasticsearchService
     }
     
     /**
-     * Return a datetime mapping
-     * @return string[]
+     * @return array<string, string>
      */
-    public function getDateTimeMapping()
+    public function getDateTimeMapping(): array
     {
         return [
             'type' => 'date',
@@ -195,10 +191,9 @@ class ElasticsearchService
     }
 
     /**
-     * Return a not indexed text mapping
-     * @return array
+     * @return array<string, string|false>
      */
-    public function getNotIndexedStringMapping()
+    public function getNotIndexedStringMapping(): array
     {
         if (version_compare($this->getVersion(), '5') > 0) {
             return [
@@ -213,8 +208,7 @@ class ElasticsearchService
     }
 
     /**
-     * Return a indexed text mapping
-     * @return array
+     * @return array<string, string|true>
      */
     public function getIndexedStringMapping()
     {
@@ -231,17 +225,16 @@ class ElasticsearchService
     }
 
     /**
-     * Return a indexed text mapping
-     * @return string[]
+     * @return array<string, string>
      */
-    public function getLongMapping()
+    public function getLongMapping(): array
     {
         return [
             "type" => "long",
         ];
     }
 
-    public function withAllMapping()
+    public function withAllMapping(): bool
     {
         return version_compare($this->getVersion(), '5.6') < 0;
     }

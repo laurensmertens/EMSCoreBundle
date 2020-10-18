@@ -11236,36 +11236,6 @@ parameters:
 			path: Service/DocumentService.php
 
 		-
-			message: "#^Method EMS\\\\CoreBundle\\\\Service\\\\ElasticsearchService\\:\\:get\\(\\) has parameter \\$ouuid with no typehint specified\\.$#"
-			count: 1
-			path: Service/ElasticsearchService.php
-
-		-
-			message: "#^Method EMS\\\\CoreBundle\\\\Service\\\\ElasticsearchService\\:\\:convertMapping\\(\\) has parameter \\$in with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Service/ElasticsearchService.php
-
-		-
-			message: "#^Method EMS\\\\CoreBundle\\\\Service\\\\ElasticsearchService\\:\\:updateMapping\\(\\) has parameter \\$mapping with no typehint specified\\.$#"
-			count: 1
-			path: Service/ElasticsearchService.php
-
-		-
-			message: "#^Method EMS\\\\CoreBundle\\\\Service\\\\ElasticsearchService\\:\\:getNotIndexedStringMapping\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Service/ElasticsearchService.php
-
-		-
-			message: "#^Method EMS\\\\CoreBundle\\\\Service\\\\ElasticsearchService\\:\\:getIndexedStringMapping\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Service/ElasticsearchService.php
-
-		-
-			message: "#^Method EMS\\\\CoreBundle\\\\Service\\\\ElasticsearchService\\:\\:withAllMapping\\(\\) has no return typehint specified\\.$#"
-			count: 1
-			path: Service/ElasticsearchService.php
-
-		-
 			message: "#^Property EMS\\\\CoreBundle\\\\Service\\\\EntityService\\:\\:\\$doctrine has no typehint specified\\.$#"
 			count: 1
 			path: Service/EntityService.php
