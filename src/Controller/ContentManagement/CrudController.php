@@ -6,6 +6,7 @@ use EMS\CommonBundle\Helper\EmsFields;
 use EMS\CommonBundle\Twig\RequestRuntime;
 use EMS\CoreBundle\Controller\AppController;
 use EMS\CoreBundle\Entity\ContentType;
+use EMS\CoreBundle\Entity\Environment;
 use EMS\CoreBundle\Entity\User;
 use EMS\CoreBundle\Exception\DataStateException;
 use EMS\CoreBundle\Service\DataService;
@@ -45,11 +46,14 @@ class CrudController extends AppController
      */
     public function createAction($ouuid, ContentType $contentType, Request $request, DataService $dataService)
     {
-        if (!$contentType->getEnvironment()->getManaged()) {
+        /** @var Environment $contentTypeEnvironment */
+        $contentTypeEnvironment = $contentType->getEnvironment();
+
+        if (!$contentTypeEnvironment->getManaged()) {
             throw new BadRequestHttpException('You can not create content for a managed content type');
         }
 
-        $rawdata = \json_decode($request->getContent(), true);
+        $rawdata = \json_decode(\strval($request->getContent()), true);
         if (empty($rawdata)) {
             throw new BadRequestHttpException('Not a valid JSON message');
         }
@@ -133,7 +137,10 @@ class CrudController extends AppController
      */
     public function finalizeAction($id, ContentType $contentType, DataService $dataService)
     {
-        if (!$contentType->getEnvironment()->getManaged()) {
+        /** @var Environment $contentTypeEnvironment */
+        $contentTypeEnvironment = $contentType->getEnvironment();
+
+        if (!$contentTypeEnvironment->getManaged()) {
             throw new BadRequestHttpException('You can not finalize content for a managed content type');
         }
 
@@ -171,12 +178,15 @@ class CrudController extends AppController
      */
     public function discardAction($id, ContentType $contentType, DataService $dataService)
     {
-        if (!$contentType->getEnvironment()->getManaged()) {
+        /** @var Environment $contentTypeEnvironment */
+        $contentTypeEnvironment = $contentType->getEnvironment();
+
+        if (!$contentTypeEnvironment->getManaged()) {
             throw new BadRequestHttpException('You can not discard content for a managed content type');
         }
 
         try {
-            $revision = $dataService->getRevisionById($id, $contentType);
+            $revision = $dataService->getRevisionById(\intval($id), $contentType);
             $dataService->discardDraft($revision);
             $isDiscard = ($revision->getId() != $id) ? true : false;
         } catch (Exception $e) {
@@ -216,7 +226,11 @@ class CrudController extends AppController
     public function deleteAction($ouuid, ContentType $contentType, DataService $dataService)
     {
         $isDeleted = false;
-        if (!$contentType->getEnvironment()->getManaged()) {
+
+        /** @var Environment $contentTypeEnvironment */
+        $contentTypeEnvironment = $contentType->getEnvironment();
+
+        if (!$contentTypeEnvironment->getManaged()) {
             throw new BadRequestHttpException('You can not delete content for a managed content type');
         }
 
@@ -257,11 +271,14 @@ class CrudController extends AppController
      */
     public function replaceAction($ouuid, ContentType $contentType, Request $request, DataService $dataService)
     {
-        if (!$contentType->getEnvironment()->getManaged()) {
+        /** @var Environment $contentTypeEnvironment */
+        $contentTypeEnvironment = $contentType->getEnvironment();
+
+        if (!$contentTypeEnvironment->getManaged()) {
             throw new BadRequestHttpException('You can not replace content for a managed content type');
         }
 
-        $rawdata = \json_decode($request->getContent(), true);
+        $rawdata = \json_decode(\strval($request->getContent()), true);
         if (empty($rawdata)) {
             throw new BadRequestHttpException('Not a valid JSON message');
         }
@@ -308,11 +325,14 @@ class CrudController extends AppController
      */
     public function mergeAction($ouuid, ContentType $contentType, Request $request, DataService $dataService)
     {
-        if (!$contentType->getEnvironment()->getManaged()) {
+        /** @var Environment $contentTypeEnvironment */
+        $contentTypeEnvironment = $contentType->getEnvironment();
+
+        if (!$contentTypeEnvironment->getManaged()) {
             throw new BadRequestHttpException('You can not merge content for a managed content type');
         }
 
-        $rawdata = \json_decode($request->getContent(), true);
+        $rawdata = \json_decode(\strval($request->getContent()), true);
         if (empty($rawdata)) {
             throw new BadRequestHttpException('Not a valid JSON message for revision '.$ouuid.' and contenttype '.$contentType->getName());
         }

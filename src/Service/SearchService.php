@@ -201,11 +201,13 @@ class SearchService
         if (1 === \sizeof($contentTypes)) {
             $contentTypeName = \array_values($contentTypes)[0];
             if (null !== $contentType = $this->contentTypeService->getByName($contentTypeName)) {
+                /** @var Search|null $search */
                 $search = $searchRepository->findOneBy(['contentType' => $contentType]);
             }
         }
 
         if (!$search instanceof Search) {
+            /** @var Search|null $search */
             $search = $searchRepository->findOneBy([
                 'default' => true,
             ]);

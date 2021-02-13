@@ -70,7 +70,9 @@ class UserManager extends BaseUserManager
      */
     public function findUserBy(array $criteria)
     {
-        return $this->getRepository()->findOneBy($criteria);
+        /** @var UserInterface|null $result */
+        $result = $this->getRepository()->findOneBy($criteria);
+        return $result;
     }
 
     /**

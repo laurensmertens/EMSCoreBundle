@@ -69,7 +69,9 @@ class GroupManager extends BaseGroupManager
      */
     public function findGroupBy(array $criteria)
     {
-        return $this->repository->findOneBy($criteria);
+        /** @var GroupInterface $result */
+        $result = $this->repository->findOneBy($criteria);
+        return $result;
     }
 
     /**
