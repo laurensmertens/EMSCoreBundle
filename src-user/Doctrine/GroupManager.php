@@ -71,6 +71,7 @@ class GroupManager extends BaseGroupManager
     {
         /** @var GroupInterface $result */
         $result = $this->repository->findOneBy($criteria);
+
         return $result;
     }
 

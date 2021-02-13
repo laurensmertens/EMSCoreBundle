@@ -72,6 +72,7 @@ class UserManager extends BaseUserManager
     {
         /** @var UserInterface|null $result */
         $result = $this->getRepository()->findOneBy($criteria);
+
         return $result;
     }
 
